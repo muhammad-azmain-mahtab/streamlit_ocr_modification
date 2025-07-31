@@ -108,14 +108,15 @@ def main():
         
         # Configure column display
         column_config = {
-            "address": st.column_config.TextColumn(
-                "Original Address",
-                width="medium",
-                help="Original address from the database"
+            "detected_angle": st.column_config.NumberColumn(
+                "Detected Angle (°)",
+                min_value=-90.0,
+                max_value=90.0,
+                format="%.1f°"
             ),
             "address_ocr_v6": st.column_config.TextColumn(
                 "Predicted Address (OCR)",
-                width="medium", 
+                width="large", 
                 help="Address extracted using OCR"
             ),
             "address_ocr_v6_accuracy": st.column_config.NumberColumn(
@@ -161,21 +162,16 @@ def main():
                         st.write(f"**🆔 ID:** {row['id']}")
                         st.write(f"**📁 Upload ID:** {row['upload_id']}")
                         st.write(f"**🌫️ Detected Blur:** {row['detected_blur']:.2f}")
+                        st.write(f"**🔄 Detected Angle:** {row['detected_angle']:.1f}°")
                         st.write(f"**📝 Address OCR Accuracy:** {row['address_ocr_v6_accuracy']:.3f}")
+                    
                         
-                        # Progress bar for accuracy
-                        accuracy_color = "green" if row['address_ocr_v6_accuracy'] > 0.7 else "orange" if row['address_ocr_v6_accuracy'] > 0.5 else "red"
-                        st.progress(row['address_ocr_v6_accuracy'])
-                        
-                        # Address information
-                        with st.expander("📍 Address Information"):
-                            if pd.notna(row.get('address')) and row.get('address'):
-                                st.write("**Original Address:**")
-                                st.text_area("", value=row['address'], height=80, disabled=True, key=f"orig_addr_{idx}")
-                            
-                            if pd.notna(row.get('address_ocr_v6')) and row.get('address_ocr_v6'):
-                                st.write("**Predicted Address (OCR):**")
-                                st.text_area("", value=row['address_ocr_v6'], height=80, disabled=True, key=f"pred_addr_{idx}")
+                        # Address information - displayed directly
+                        st.markdown("**📍 Predicted Address (OCR):**")
+                        if pd.notna(row.get('address_ocr_v6')) and row.get('address_ocr_v6'):
+                            st.text_area("", value=row['address_ocr_v6'], height=80, disabled=True, key=f"pred_addr_{idx}", label_visibility="collapsed")
+                        else:
+                            st.info("No predicted address available")
                         
                         # Quality indicators
                         quality_col1, quality_col2 = st.columns(2)
@@ -222,14 +218,17 @@ def main():
                         image = display_image(row_data['image_path'])
                         if image:
                             st.image(image, use_container_width=True, width=300)
-                            st.caption(f"ID: {row_data['id']}")
-                            st.caption(f"Accuracy: {row_data['address_ocr_v6_accuracy']:.3f}")
-                            st.caption(f"Blur: {row_data['detected_blur']:.1f}")
+                            st.caption(f"**ID:** {row_data['id']}")
+                            st.caption(f"**Accuracy:** {row_data['address_ocr_v6_accuracy']:.3f}")
+                            st.caption(f"**Blur:** {row_data['detected_blur']:.1f}")
+                            st.caption(f"**Angle:** {row_data['detected_angle']:.1f}°")
                             
-                            # Address preview in gallery
-                            with st.expander(f"📍 Address - ID {row_data['id']}"):
-                                if pd.notna(row_data.get('address_ocr_v6')) and row_data.get('address_ocr_v6'):
-                                    st.text_area("Predicted Address:", value=row_data['address_ocr_v6'], height=60, disabled=True, key=f"gallery_addr_{img_idx}")
+                            # Address information - displayed directly
+                            st.markdown("**📍 Predicted Address:**")
+                            if pd.notna(row_data.get('address_ocr_v6')) and row_data.get('address_ocr_v6'):
+                                st.text_area("", value=row_data['address_ocr_v6'], height=80, disabled=True, key=f"gallery_addr_{img_idx}", label_visibility="collapsed")
+                            else:
+                                st.info("No predicted address")
     
     # Download section
     st.markdown("---")

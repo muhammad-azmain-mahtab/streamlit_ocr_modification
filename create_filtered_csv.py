@@ -12,7 +12,7 @@ def create_filtered_csv():
     df = pd.read_csv(csv_file)
     
     # Select only the required columns
-    required_columns = ['id', 'upload_id', 'detected_blur', 'address_ocr_v6_accuracy', 'address_ocr_v6']
+    required_columns = ['id', 'upload_id', 'detected_blur', 'detected_angle', 'address_ocr_v6_accuracy', 'address_ocr_v6']
     
     # Filter the dataframe to keep only required columns
     filtered_df = df[required_columns].copy()
