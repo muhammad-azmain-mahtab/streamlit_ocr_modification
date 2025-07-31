@@ -68,18 +68,18 @@ def main():
     )
     
     # Filter by blur range
-    max_blur = st.sidebar.slider(
-        "Maximum Detected Blur", 
+    min_blur = st.sidebar.slider(
+        "Minimum Detected Blur", 
         min_value=float(df['detected_blur'].min()), 
         max_value=float(df['detected_blur'].max()), 
-        value=float(df['detected_blur'].max()),
+        value=float(df['detected_blur'].min()),
         step=100.0
     )
     
     # Filter data
     filtered_df = df[
         (df['address_ocr_v6_accuracy'] >= min_accuracy) & 
-        (df['detected_blur'] <= max_blur)
+        (df['detected_blur'] >= min_blur)
     ]
     
     # Display statistics
@@ -239,7 +239,7 @@ def main():
         st.download_button(
             label="📥 Download CSV",
             data=csv,
-            file_name=f"filtered_nid_data_{min_accuracy}_{max_blur}.csv",
+            file_name=f"filtered_nid_data_{min_accuracy}_{min_blur}.csv",
             mime="text/csv"
         )
 

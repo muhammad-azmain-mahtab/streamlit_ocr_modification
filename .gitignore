@@ -1,9 +1,10 @@
 # Image folders - contain large binary files
 uploads/
 address images/
+detected_regions/
 
-# Generated CSV files
-*.csv
+# # Generated CSV files
+# *.csv
 
 # Python cache
 __pycache__/
