@@ -131,21 +131,19 @@ def main():
         
     elif display_mode == "Card View":
         st.subheader("🗃️ Card View")
-        
+        # Sort by detected_blur ascending
+        sorted_df = filtered_df.sort_values(by="detected_blur", ascending=True).reset_index(drop=True)
         # Pagination
         items_per_page = st.selectbox("Items per page:", [5, 10, 20, 50], index=1)
-        total_pages = len(filtered_df) // items_per_page + (1 if len(filtered_df) % items_per_page > 0 else 0)
-        
+        total_pages = len(sorted_df) // items_per_page + (1 if len(sorted_df) % items_per_page > 0 else 0)
         if total_pages > 0:
             page = st.selectbox("Page:", range(1, total_pages + 1))
             start_idx = (page - 1) * items_per_page
             end_idx = start_idx + items_per_page
-            page_df = filtered_df.iloc[start_idx:end_idx]
-            
+            page_df = sorted_df.iloc[start_idx:end_idx]
             for idx, row in page_df.iterrows():
                 with st.container():
                     col1, col2 = st.columns([2, 3])  # Made image column larger
-                    
                     with col1:
                         # Display image
                         if pd.notna(row['image_path']) and row['image_path'] != "":
@@ -156,7 +154,6 @@ def main():
                                 st.error("❌ Image failed to load")
                         else:
                             st.info("📷 No image available")
-                    
                     with col2:
                         # Display data
                         st.write(f"**🆔 ID:** {row['id']}")
@@ -164,15 +161,12 @@ def main():
                         st.write(f"**🌫️ Detected Blur:** {row['detected_blur']:.2f}")
                         st.write(f"**🔄 Detected Angle:** {row['detected_angle']:.1f}°")
                         st.write(f"**📝 Address OCR Accuracy:** {row['address_ocr_v6_accuracy']:.3f}")
-                    
-                        
                         # Address information - displayed directly
                         st.markdown("**📍 Predicted Address (OCR):**")
                         if pd.notna(row.get('address_ocr_v6')) and row.get('address_ocr_v6'):
-                            st.text_area("", value=row['address_ocr_v6'], height=80, disabled=True, key=f"pred_addr_{idx}", label_visibility="collapsed")
+                            st.text_area("Predicted Address", value=row['address_ocr_v6'], height=80, disabled=True, key=f"pred_addr_{idx}", label_visibility="collapsed")
                         else:
                             st.info("No predicted address available")
-                        
                         # Quality indicators
                         quality_col1, quality_col2 = st.columns(2)
                         with quality_col1:
@@ -182,7 +176,6 @@ def main():
                                 st.warning("🟡 Medium Accuracy")
                             else:
                                 st.error("🔴 Low Accuracy")
-                        
                         with quality_col2:
                             if row['detected_blur'] < 500:
                                 st.success("🟢 Low Blur")
@@ -190,24 +183,20 @@ def main():
                                 st.warning("🟡 Medium Blur")
                             else:
                                 st.error("🔴 High Blur")
-                    
                     st.markdown("---")
     
     elif display_mode == "Image Gallery":
         st.subheader("🖼️ Image Gallery")
-        
         # Filter only rows with images
         image_df = filtered_df[filtered_df['image_path'] != ""]
-        
+        # Sort by detected_blur ascending
+        image_df = image_df.sort_values(by="detected_blur", ascending=True).reset_index(drop=True)
         if len(image_df) == 0:
             st.warning("No images available for the current filters.")
             return
-        
         # Grid layout
         cols_per_row = st.selectbox("Images per row:", [2, 3, 4, 5], index=1)  # Changed default to 3 (less columns = larger images)
-        
         rows = len(image_df) // cols_per_row + (1 if len(image_df) % cols_per_row > 0 else 0)
-        
         for row_idx in range(rows):
             cols = st.columns(cols_per_row)
             for col_idx in range(cols_per_row):
@@ -222,11 +211,10 @@ def main():
                             st.caption(f"**Accuracy:** {row_data['address_ocr_v6_accuracy']:.3f}")
                             st.caption(f"**Blur:** {row_data['detected_blur']:.1f}")
                             st.caption(f"**Angle:** {row_data['detected_angle']:.1f}°")
-                            
                             # Address information - displayed directly
                             st.markdown("**📍 Predicted Address:**")
                             if pd.notna(row_data.get('address_ocr_v6')) and row_data.get('address_ocr_v6'):
-                                st.text_area("", value=row_data['address_ocr_v6'], height=80, disabled=True, key=f"gallery_addr_{img_idx}", label_visibility="collapsed")
+                                st.text_area("Predicted Address", value=row_data['address_ocr_v6'], height=80, disabled=True, key=f"gallery_addr_{img_idx}", label_visibility="collapsed")
                             else:
                                 st.info("No predicted address")
     

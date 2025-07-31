@@ -7,7 +7,7 @@ from math import degrees, atan2
 
 def detect_blur_level(image_path):
     """
-    Detect blur level using Laplacian variance and simple contour detection.
+    Detect blur level using only Laplacian variance.
     Returns the blur score and a label ('blur' or 'clear').
     """
     img = cv2.imread(image_path)
@@ -19,20 +19,7 @@ def detect_blur_level(image_path):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     edge_var = cv2.Laplacian(gray, cv2.CV_64F).var()
 
-    threshold_v = 300  # You can adjust this threshold
-    if edge_var < threshold_v:
-        return edge_var, "blur"
-
-    # Simple detection: count contours as proxy for boxes
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    edges = cv2.Canny(blurred, 50, 150)
-    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    num_boxes = len(contours)
-
-    if num_boxes <= 8:
-        return edge_var, "blur"
-    else:
-        return edge_var, "clear"
+    return edge_var
     
 def get_line_angle(x1, y1, x2, y2):
     angle = degrees(atan2(y2 - y1, x2 - x1))
@@ -111,7 +98,7 @@ def process_images_and_create_csv():
         image_path = os.path.join(image_dir, image_file)
         
         # Detect blur level
-        blur_score, blur_label = detect_blur_level(image_path)
+        blur_score = detect_blur_level(image_path)
 
         # Detect angle
         detected_angle = detect_card_angle_fixed(image_path)
@@ -120,7 +107,6 @@ def process_images_and_create_csv():
         results.append({
             'image_name': image_file,
             'detected_blur': blur_score,
-            'blur_label': blur_label,
             'detected_angle': detected_angle
         })
     

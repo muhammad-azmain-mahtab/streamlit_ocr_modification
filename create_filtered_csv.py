@@ -127,6 +127,6 @@ def create_filtered_csv(use_original_blur_angle=False):
 
 if __name__ == "__main__":
     # Default: use merged blur/angle
-    create_filtered_csv(use_original_blur_angle=True)
+    create_filtered_csv(use_original_blur_angle=False)
     # Uncomment below to use original blur/angle from csv_file
     # create_filtered_csv(use_original_blur_angle=True)
