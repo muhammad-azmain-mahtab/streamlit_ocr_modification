@@ -1,0 +1,26 @@
+# Image folders - contain large binary files
+uploads/
+address images/
+
+# Generated CSV files
+*.csv
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment files
+.env
+venv/
+env/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
